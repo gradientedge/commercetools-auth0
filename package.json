@@ -1,0 +1,91 @@
+{
+  "name": "@gradientedge/commercetools-auth0",
+  "version": "0.0.0-development",
+  "description": "Facilitates to synchronisation of customer account and cart data between auth0 and commercetools",
+  "main": "./dist/ge-commercetools-auth0-node.cjs.js",
+  "module": "./dist/ge-commercetools-auth0-node.esm.js",
+  "types": "./dist/typings/index.d.ts",
+  "scripts": {
+    "cz": "cz",
+    "build": "npm run build-cjs && npm run build-esm",
+    "build-cjs": "tsc",
+    "build-esm": "tsc --project tsconfig.esm.json",
+    "clean": "rimraf dist",
+    "clean:cjs": "rimraf dist/cjs",
+    "clean:esm": "rimraf dist/esm",
+    "watch": "tsc --watch",
+    "lint": "eslint './src/**/*.ts' --max-warnings=0",
+    "package": "npm run clean && npm run build && npm run bundle && npm run clean:cjs && npm run clean:esm && npm run typings",
+    "prepare": "husky install",
+    "prettier": "prettier --check \"**/*.{ts,js,json}\"",
+    "prettify": "prettier --write \"**/*.{ts,js,json}\"",
+    "test": "TZ=UTC jest --passWithNoTests --runInBand",
+    "validate": "npm run prettier && npm run lint && npm run test",
+    "docs": "typedoc",
+    "semantic-release": "semantic-release",
+    "bundle": "webpack --config=webpack.config.js",
+    "typings": "tsc --outDir ./dist/typings --emitDeclarationOnly --declarationMap false"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gradientedge/commercetools-auth0.git"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "commercetools",
+    "auth0"
+  ],
+  "author": "Gradient Edge Ltd.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gradientedge/commercetools-auth0/issues"
+  },
+  "homepage": "https://github.com/gradientedge/commercetools-auth0#readme",
+  "devDependencies": {
+    "@sinonjs/fake-timers": "^9.1.1",
+    "@types/jest": "^27.4.1",
+    "@types/json-stringify-safe": "^5.0.0",
+    "@types/lodash": "^4.14.179",
+    "@types/lodash.clonedeep": "^4.5.6",
+    "@types/node": "17.0.21",
+    "@types/qs": "^6.9.7",
+    "@types/sinonjs__fake-timers": "^8.1.1",
+    "@types/traverse": "^0.6.32",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "codecov": "^3.8.3",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^7.0.4",
+    "jest": "^27.5.1",
+    "jest-matcher-specific-error": "^1.0.0",
+    "jest-mock": "^27.5.1",
+    "nock": "^13.2.4",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "semantic-release": "^19.0.2",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^10.7.0",
+    "typedoc": "^0.22.13",
+    "typescript": "~4.6.2",
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "@gradientedge/commercetools-utils": "^4.12.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
