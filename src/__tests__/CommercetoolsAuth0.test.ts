@@ -197,4 +197,62 @@ describe('CommercetoolsAuth0', () => {
       expect(result).toBeNull()
     })
   })
+
+  describe('mergeAnonymousToAccountCart', () => {
+    it('should not attempt to merge when the provided cart has no customer id', async () => {
+      const mockAnonymousCart = _.cloneDeep({
+        ...mockCart,
+        id: 'anonymous-cart-id',
+        anonymousId: 'anonymous-customer-id',
+      })
+      const mockCustomerCart = _.cloneDeep({
+        ...mockCart,
+        id: 'anonymous-cart-id',
+        customerId: undefined,
+      })
+      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
+
+      const result = await commercetoolsAuth0.mergeAnonymousToAccountCart({
+        accountCustomerCart: mockCustomerCart,
+        anonymousCustomerCart: mockAnonymousCart,
+      })
+
+      expect(result).toBeNull()
+    })
+
+    it('should defer to `assignAnonymousCartToAccountCustomer`', async () => {
+      const mockAnonymousCart = _.cloneDeep({
+        ...mockCart,
+        id: 'anonymous-cart-id',
+        anonymousId: 'anonymous-customer-id',
+      })
+      const mockCustomerCart = _.cloneDeep({
+        ...mockCart,
+        id: 'anonymous-cart-id',
+        customerId: 'account-customer-id',
+      })
+      const mockUpdatedCart = _.cloneDeep({
+        ...mockAnonymousCart,
+        customerId: 'account-customer-id',
+      })
+      nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .post('/test-project-key/carts/anonymous-cart-id', {
+          version: 9,
+          actions: [{ action: 'setCustomerId', customerId: 'account-customer-id' }],
+        })
+        .reply(200, mockUpdatedCart)
+      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
+
+      const result = await commercetoolsAuth0.mergeAnonymousToAccountCart({
+        accountCustomerCart: mockCustomerCart,
+        anonymousCustomerCart: mockAnonymousCart,
+      })
+
+      expect(result).toEqual(mockUpdatedCart)
+    })
+  })
 })
