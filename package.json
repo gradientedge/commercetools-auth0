@@ -5,6 +5,7 @@
   "main": "./dist/ge-commercetools-auth0-node.cjs.js",
   "module": "./dist/ge-commercetools-auth0-node.esm.js",
   "types": "./dist/typings/index.d.ts",
+  "private": false,
   "scripts": {
     "cz": "cz",
     "build": "npm run build-cjs && npm run build-esm",
