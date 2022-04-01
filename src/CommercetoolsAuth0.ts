@@ -80,7 +80,10 @@ export class CommercetoolsAuth0 {
         id: options.accountCustomerId,
       })
     } catch (e) {
-      throw new CommercetoolsAuth0Error('Unable to retrieve customer', CommercetoolsAuth0ErrorCode.UNEXPECTED_ERROR)
+      throw new CommercetoolsAuth0Error('Unable to retrieve customer', {
+        code: CommercetoolsAuth0ErrorCode.UNEXPECTED_ERROR,
+        originalError: e,
+      })
     }
 
     try {
@@ -98,7 +101,10 @@ export class CommercetoolsAuth0 {
         },
       })
     } catch (e) {
-      throw new CommercetoolsAuth0Error('Unable to set `externalId`', CommercetoolsAuth0ErrorCode.UNEXPECTED_ERROR)
+      throw new CommercetoolsAuth0Error('Unable to set `externalId`', {
+        code: CommercetoolsAuth0ErrorCode.UNEXPECTED_ERROR,
+        originalError: e,
+      })
     }
   }
 
@@ -204,10 +210,10 @@ export class CommercetoolsAuth0 {
         if (e.status === 400) {
           const errors = e.data?.response?.data?.errors
           if (errors?.[0]?.code === 'DuplicateField' && errors?.[0]?.field === 'email') {
-            throw new CommercetoolsAuth0Error(
-              `Customer [${options.user.email}] already exists in commercetools`,
-              CommercetoolsAuth0ErrorCode.CUSTOMER_EXISTS,
-            )
+            throw new CommercetoolsAuth0Error(`Customer [${options.user.email}] already exists in commercetools`, {
+              code: CommercetoolsAuth0ErrorCode.CUSTOMER_EXISTS,
+              originalError: e,
+            })
           }
         }
       }
@@ -222,7 +228,7 @@ export class CommercetoolsAuth0 {
   public async assignAnonymousCartToAccountCustomer(
     options: AssignAnonymousCartToAccountCustomerParams,
   ): Promise<Cart | null> {
-    let cart: Cart | null = null
+    let cart: Cart | null
     try {
       cart = await this.client.updateCartById({
         id: options.anonymousCustomerCart.id,
