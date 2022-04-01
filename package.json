@@ -1,7 +1,7 @@
 {
   "name": "@gradientedge/commercetools-auth0",
   "version": "0.0.0-development",
-  "description": "Facilitates to synchronisation of customer account and cart data between auth0 and commercetools",
+  "description": "Facilitates to synchronisation of customer account and cart data between auth0 and commercetools.",
   "main": "./dist/ge-commercetools-auth0-node.cjs.js",
   "module": "./dist/ge-commercetools-auth0-node.esm.js",
   "types": "./dist/typings/index.d.ts",
