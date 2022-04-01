@@ -217,7 +217,9 @@ export class CommercetoolsAuth0 {
           }
         }
       }
-      throw new CommercetoolsAuth0Error(`Error creating customer in commercetools: ${e.message}`)
+      throw new CommercetoolsAuth0Error(`Error creating customer in commercetools: ${e.message}`, {
+        originalError: e,
+      })
     }
     return signInResult.customer
   }
