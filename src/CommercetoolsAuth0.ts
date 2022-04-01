@@ -7,7 +7,6 @@ import {
   PostLoginSyncParams,
   MergeAnonymousToAccountCartParams,
   MergeCartParams,
-  PreRegistrationSyncParams,
   GetCartParams,
   PostRegistrationSyncParams,
 } from './types'
@@ -63,17 +62,6 @@ export class CommercetoolsAuth0 {
       })
     }
     return customer
-  }
-
-  /**
-   * Pre-registration synchronisation functionality
-   *
-   * This method should be called when the pre-registration action is executed.
-   * We do not have access to the Auth0 user id at this point, and so cannot set
-   * the externalId property on the commercetools customer record at this point.
-   */
-  public async preRegistrationSync(options: PreRegistrationSyncParams): Promise<Customer> {
-    return await this.createCustomer(options)
   }
 
   /**

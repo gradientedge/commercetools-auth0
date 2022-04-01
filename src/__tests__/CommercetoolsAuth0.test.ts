@@ -1,7 +1,6 @@
 import { CommercetoolsAuth0 } from '../CommercetoolsAuth0'
 import { Cart } from '@gradientedge/commercetools-utils'
 import { mockCart, mockClientGrantResponse, mockConfig, mockCustomer } from './mocks'
-import { CommercetoolsAuth0Error } from '../error'
 import nock from 'nock'
 import _ from 'lodash'
 
@@ -111,99 +110,6 @@ describe('CommercetoolsAuth0', () => {
 
       expect(result).toBeNull()
       expect(commercetoolsAuth0.mergeCart).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('preRegistrationSync', () => {
-    it('should return the customer object when successfully created in commercetools', async () => {
-      nock('https://api.europe-west1.gcp.commercetools.com', {
-        reqheaders: {
-          authorization: 'Bearer test-access-token',
-        },
-      })
-        .post('/test-project-key/customers', {
-          email: 'jimmy@gradientedge.com',
-          authenticationMode: 'ExternalAuth',
-        })
-        .reply(200, { customer: mockCustomer })
-      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
-
-      const result = await commercetoolsAuth0.preRegistrationSync({
-        user: {
-          email: 'jimmy@gradientedge.com',
-        },
-      })
-
-      expect(result).toEqual(mockCustomer)
-    })
-
-    it('should throw an error if the customer already exists', async () => {
-      let error: any
-      nock('https://api.europe-west1.gcp.commercetools.com', {
-        reqheaders: {
-          authorization: 'Bearer test-access-token',
-        },
-      })
-        .post('/test-project-key/customers', {
-          email: 'jimmy@gradientedge.com',
-          authenticationMode: 'ExternalAuth',
-        })
-        .reply(400, {
-          statusCode: 400,
-          message: 'There is already an existing customer with the provided email.',
-          errors: [
-            {
-              code: 'DuplicateField',
-              message: 'There is already an existing customer with the provided email.',
-              duplicateValue: 'jimmy@gradientedge.com',
-              field: 'email',
-            },
-          ],
-        })
-      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
-
-      try {
-        await commercetoolsAuth0.preRegistrationSync({
-          user: {
-            email: 'jimmy@gradientedge.com',
-          },
-        })
-      } catch (e) {
-        error = e
-      }
-
-      expect(error).toBeInstanceOf(CommercetoolsAuth0Error)
-      expect(error.message).toBe('Customer [jimmy@gradientedge.com] already exists in commercetools')
-      expect(error.code).toBe('CUSTOMER_EXISTS')
-    })
-
-    it('should throw an error if there was an unexpected error creating the customer', async () => {
-      let error: any
-      nock('https://api.europe-west1.gcp.commercetools.com', {
-        reqheaders: {
-          authorization: 'Bearer test-access-token',
-        },
-      })
-        .post('/test-project-key/customers', {
-          email: 'jimmy@gradientedge.com',
-          authenticationMode: 'ExternalAuth',
-        })
-        .reply(400)
-      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
-
-      try {
-        await commercetoolsAuth0.preRegistrationSync({
-          user: {
-            email: 'jimmy@gradientedge.com',
-          },
-        })
-      } catch (e) {
-        error = e
-      }
-
-      expect(error).toBeInstanceOf(CommercetoolsAuth0Error)
-      expect(error.message).toBe('Error creating customer in commercetools: Request failed with status code 400')
-      expect(error.code).toBe('UNEXPECTED_ERROR')
     })
   })
 
