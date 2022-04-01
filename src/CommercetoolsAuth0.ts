@@ -9,7 +9,6 @@ import {
   MergeAnonymousToAccountCartParams,
   MergeCartParams,
   GetCartParams,
-  PostRegistrationSyncParams,
 } from './types'
 import { COMMERCETOOLS_REQUIRED_SCOPES, DEFAULT_REQUEST_TIMEOUT_MS } from './constants'
 import { CommercetoolsAuth0ErrorCode } from './error/codes'
@@ -69,50 +68,6 @@ export class CommercetoolsAuth0 {
       })
     }
     return customer
-  }
-
-  /**
-   * Post-registration synchronisation functionality
-   *
-   * This method should be called when the post-registration action is executed.
-   * It is used to set the `externalId` on the commercetools customer based on the
-   * given Auth0 user id.
-   */
-  public async postRegistrationSync(options: PostRegistrationSyncParams): Promise<void> {
-    let customer: Customer | null = null
-
-    try {
-      customer = await this.client.getCustomerById({
-        storeKey: options.storeKey,
-        id: options.accountCustomerId,
-      })
-    } catch (e) {
-      throw new CommercetoolsAuth0Error('Unable to retrieve customer', {
-        code: CommercetoolsAuth0ErrorCode.UNEXPECTED_ERROR,
-        originalError: e,
-      })
-    }
-
-    try {
-      await this.client.updateCustomerById({
-        id: options.accountCustomerId,
-        storeKey: options.storeKey,
-        data: {
-          version: customer.version,
-          actions: [
-            {
-              action: 'setExternalId',
-              externalId: options.userId,
-            },
-          ],
-        },
-      })
-    } catch (e) {
-      throw new CommercetoolsAuth0Error('Unable to set `externalId`', {
-        code: CommercetoolsAuth0ErrorCode.UNEXPECTED_ERROR,
-        originalError: e,
-      })
-    }
   }
 
   /**

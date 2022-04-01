@@ -48,23 +48,6 @@ export interface PostLoginSyncParams {
   mergeCart: true | false | 'use_anonymous'
 }
 
-export interface PostRegistrationSyncParams {
-  /**
-   * The customer id of the newly registered customer
-   */
-  accountCustomerId: string
-  /**
-   * The key of the commercetools store that this customer relates to
-   *
-   * Not required if customers are global.
-   */
-  storeKey?: string
-  /**
-   * The Auth0 user id
-   */
-  userId: string
-}
-
 export interface CreateCustomerParams {
   storeKey?: string
   user: {
@@ -73,11 +56,6 @@ export interface CreateCustomerParams {
     firstName?: string
     lastName?: string
   }
-}
-
-export interface GetAnonymousCustomerCartParams {
-  storeKey?: string
-  anonymousCustomerId: string
 }
 
 export interface GetCartParams {
