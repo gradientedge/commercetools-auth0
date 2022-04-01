@@ -46,29 +46,6 @@ export interface PostLoginSyncParams {
   mergeCart: true | false | 'use_anonymous'
 }
 
-export interface PreRegistrationSyncParams {
-  /**
-   * Only defined if the customer has logged in in after having already
-   * added something to their cart as an anonymous customer
-   */
-  anonymousCustomerId?: string
-  /**
-   * The key of the commercetools store that this customer relates to
-   *
-   * Not required if customers are global.
-   */
-  storeKey?: string
-  /**
-   * User profile data as provided by Auth0
-   */
-  user: {
-    id?: string
-    email: string
-    firstName?: string
-    lastName?: string
-  }
-}
-
 export interface PostRegistrationSyncParams {
   /**
    * The customer id of the newly registered customer
