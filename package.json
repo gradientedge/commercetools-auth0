@@ -83,8 +83,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@gradientedge/commercetools-utils": "^4.13.0",
-    "@gradientedge/error": "^0.1.2"
+    "@gradientedge/commercetools-utils": "^4.13.0"
   },
   "config": {
     "commitizen": {
