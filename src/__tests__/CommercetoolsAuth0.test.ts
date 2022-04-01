@@ -255,4 +255,34 @@ describe('CommercetoolsAuth0', () => {
       expect(result).toEqual(mockUpdatedCart)
     })
   })
+
+  describe('createCustomer', () => {
+    it('should return the customer when created successfully', async () => {
+      nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .post('/test-project-key/customers', {
+          email: 'jimmy@gradientedge.com',
+          firstName: 'Jimmy',
+          lastName: 'Thomson',
+          externalId: 'auth0|12345678901234567890',
+          authenticationMode: 'ExternalAuth',
+        })
+        .reply(200, { customer: mockCustomer })
+      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
+
+      const result = await commercetoolsAuth0.createCustomer({
+        user: {
+          id: 'auth0|12345678901234567890',
+          email: 'jimmy@gradientedge.com',
+          firstName: 'Jimmy',
+          lastName: 'Thomson',
+        },
+      })
+
+      expect(result).toEqual(mockCustomer)
+    })
+  })
 })
