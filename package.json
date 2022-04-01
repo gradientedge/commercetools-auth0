@@ -69,6 +69,7 @@
     "jest": "^27.5.1",
     "jest-matcher-specific-error": "^1.0.0",
     "jest-mock": "^27.5.1",
+    "lodash": "^4.17.21",
     "nock": "^13.2.4",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
@@ -81,7 +82,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@gradientedge/commercetools-utils": "^4.12.1"
+    "@gradientedge/commercetools-utils": "^4.13.0"
   },
   "config": {
     "commitizen": {
