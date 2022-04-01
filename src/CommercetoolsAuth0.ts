@@ -169,11 +169,16 @@ export class CommercetoolsAuth0 {
   public async getActiveCart(options: GetCartParams): Promise<Cart | null> {
     let cart: Cart | null = null
 
+    let field = 'customerId'
+    if (options.customerType === 'anonymous') {
+      field = 'anonymousId'
+    }
+
     try {
       const carts = await this.client.queryCarts({
         storeKey: options.storeKey,
         params: {
-          where: [`anonymousId = "${options.customerId}"`, 'cartState = "Active"'],
+          where: [`${field} = "${options.customerId}"`, 'cartState = "Active"'],
           sort: 'lastModifiedAt desc',
         },
       })

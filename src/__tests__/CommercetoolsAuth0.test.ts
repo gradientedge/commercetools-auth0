@@ -285,4 +285,66 @@ describe('CommercetoolsAuth0', () => {
       expect(result).toEqual(mockCustomer)
     })
   })
+
+  describe('getActiveCart', () => {
+    it("should retrieve the anonymous customer cart when the `customerType` is set to 'anonymous'", async () => {
+      const mockAnonymousCart = _.cloneDeep({ ...mockCart, anonymousId: 'anonymous-customer-id' })
+      nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .get('/test-project-key/carts')
+        .query({
+          where: ['anonymousId = "anonymous-customer-id"', 'cartState = "Active"'],
+          sort: 'lastModifiedAt desc',
+        })
+        .reply(200, {
+          count: 1,
+          total: 1,
+          results: [mockAnonymousCart],
+        })
+
+      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
+
+      const result = await commercetoolsAuth0.getActiveCart({
+        customerType: 'anonymous',
+        customerId: 'anonymous-customer-id',
+      })
+
+      expect(result).toEqual(mockAnonymousCart)
+    })
+
+    it("should retrieve the account customer cart when the `customerType` is set to 'account'", async () => {
+      const mockCustomerCart = _.cloneDeep({
+        ...mockCart,
+        anonymousId: 'anonymous-customer-id',
+        customerId: 'account-customer-id',
+      })
+      nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .get('/test-project-key/carts')
+        .query({
+          where: ['customerId = "account-customer-id"', 'cartState = "Active"'],
+          sort: 'lastModifiedAt desc',
+        })
+        .reply(200, {
+          count: 1,
+          total: 1,
+          results: [mockCustomerCart],
+        })
+
+      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
+
+      const result = await commercetoolsAuth0.getActiveCart({
+        customerType: 'account',
+        customerId: 'account-customer-id',
+      })
+
+      expect(result).toEqual(mockCustomerCart)
+    })
+  })
 })
