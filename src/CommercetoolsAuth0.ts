@@ -243,6 +243,9 @@ export class CommercetoolsAuth0 {
         storeKey: options.storeKey,
         actions: [
           {
+            action: 'setAnonymousId',
+          },
+          {
             action: 'setCustomerId',
             customerId: options.accountCustomerId,
           },
