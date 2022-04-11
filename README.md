@@ -3,3 +3,6 @@
 [![Coverage][coverage]][codecov-url]
 
 # Gradient Edge commercetools auth0
+
+[codecov-url]: https://app.codecov.io/gh/gradientedge/commercetools-auth0
+[coverage]: https://codecov.io/gh/gradientedge/commercetools-auth0/branch/main/graph/badge.svg

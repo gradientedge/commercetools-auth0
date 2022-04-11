@@ -158,7 +158,7 @@ describe('CommercetoolsAuth0', () => {
       })
         .post('/test-project-key/carts/anonymous-cart-id', {
           version: 9,
-          actions: [{ action: 'setCustomerId', customerId: 'account-customer-id' }],
+          actions: [{ action: 'setAnonymousId' }, { action: 'setCustomerId', customerId: 'account-customer-id' }],
         })
         .reply(200, mockUpdatedCart)
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
@@ -242,7 +242,7 @@ describe('CommercetoolsAuth0', () => {
       })
         .post('/test-project-key/carts/anonymous-cart-id', {
           version: 9,
-          actions: [{ action: 'setCustomerId', customerId: 'account-customer-id' }],
+          actions: [{ action: 'setAnonymousId' }, { action: 'setCustomerId', customerId: 'account-customer-id' }],
         })
         .reply(200, mockUpdatedCart)
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
