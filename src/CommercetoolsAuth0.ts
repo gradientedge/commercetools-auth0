@@ -10,7 +10,7 @@ import {
   GetCartParams,
   PostRegistrationSyncParams,
 } from './types'
-import { COMMERCETOOLS_REQUIRED_SCOPES } from './constants'
+import { COMMERCETOOLS_REQUIRED_SCOPES, DEFAULT_REQUEST_TIMEOUT_MS } from './constants'
 import { CommercetoolsAuth0ErrorCode } from './error/codes'
 
 export class CommercetoolsAuth0 {
@@ -20,6 +20,7 @@ export class CommercetoolsAuth0 {
   constructor(options: CommercetoolsAuth0Config) {
     this.config = options
     this.client = new CommercetoolsApi({
+      timeoutMs: DEFAULT_REQUEST_TIMEOUT_MS,
       ...options.commercetools,
       clientScopes: COMMERCETOOLS_REQUIRED_SCOPES,
     })

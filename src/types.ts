@@ -6,6 +6,7 @@ export interface CommercetoolsAuth0Config {
     clientSecret: string
     region: Region
     projectKey: string
+    timeoutMs?: number
   }
 }
 
