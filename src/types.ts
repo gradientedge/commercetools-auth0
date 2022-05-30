@@ -7,6 +7,7 @@ export interface CommercetoolsAuth0Config {
     region: Region
     projectKey: string
     timeoutMs?: number
+    deleteObsoleteCarts?: true | false
   }
 }
 
@@ -83,12 +84,17 @@ export interface GetCartParams {
   storeKey?: string
   customerId: string
   customerType: 'anonymous' | 'account'
+  limit?: number
 }
 
 export interface MergeCartParams {
   storeKey?: string
   accountCustomerId: string
   anonymousCustomerId: string
+}
+
+export interface DeleteObsoleteCartParams extends GetCartParams {
+  activeCartId: string
 }
 
 export interface AssignAnonymousCartToAccountCustomerParams {
