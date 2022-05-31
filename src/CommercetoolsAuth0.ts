@@ -4,6 +4,7 @@ import {
   AssignAnonymousCartToAccountCustomerParams,
   CommercetoolsAuth0Config,
   CreateCustomerParams,
+  DeleteObsoleteCartParams,
   PostLoginSyncParams,
   MergeAnonymousToAccountCartParams,
   MergeCartParams,
@@ -18,7 +19,12 @@ export class CommercetoolsAuth0 {
   public readonly config: CommercetoolsAuth0Config
 
   constructor(options: CommercetoolsAuth0Config) {
-    this.config = options
+    this.config = {
+      commercetools: {
+        deleteObsoleteCarts: true,
+        ...options.commercetools,
+      },
+    }
     this.client = new CommercetoolsApi({
       timeoutMs: DEFAULT_REQUEST_TIMEOUT_MS,
       ...options.commercetools,
@@ -155,6 +161,19 @@ export class CommercetoolsAuth0 {
           anonymousCustomerCart,
           accountCustomerCart,
         })
+
+        if (cart && this.config.commercetools.deleteObsoleteCarts) {
+          const { cartsToDelete, cartsDeleted } = await this.deleteObsoleteCarts({
+            customerType: 'account',
+            customerId: options.accountCustomerId,
+            storeKey: options.storeKey,
+            activeCartId: cart.id,
+          })
+
+          if (cartsToDelete !== cartsDeleted) {
+            console.log(`Error deleting obsolete carts for customer with account Id of [${options.accountCustomerId}]`)
+          }
+        }
       }
     }
 
@@ -162,13 +181,52 @@ export class CommercetoolsAuth0 {
   }
 
   /**
-   * Get the active cart for a given anonymous/account customer id
+   * Get the carts with `cartState` of `Active` and delete those that are not
+   * the `Active` as identified by the getActiveCart function.
+   */
+  public async deleteObsoleteCarts(
+    options: DeleteObsoleteCartParams,
+  ): Promise<{ cartsToDelete: number; cartsDeleted: number }> {
+    let cartsDeleted = 0
+
+    const carts = await this.getAllActiveCarts({
+      customerType: options.customerType,
+      customerId: options.customerId,
+      storeKey: options.storeKey,
+    })
+
+    const cartsForDeletion = carts.filter((cart: Cart) => {
+      return cart.id !== options.activeCartId
+    })
+
+    for (const cart of cartsForDeletion) {
+      try {
+        await this.client.deleteCartById({
+          id: cart.id,
+          version: cart.version,
+        })
+
+        cartsDeleted++
+      } catch (e) {
+        console.log(`Error deleting cart with Id of [${cart.id}]`)
+      }
+    }
+
+    return {
+      cartsToDelete: cartsForDeletion.length,
+      cartsDeleted,
+    }
+  }
+
+  /**
+   * Get the active cart(s) for a given anonymous/account customer id
    *
    * A customer's active cart is defined as their most recently modified cart which
-   * has a `cartState` of `Active`.
+   * has a `cartState` of `Active` though it is possible for there to be more than
+   * one cart with a cartState of `Active' - the latter set will be retrieved.
    */
-  public async getActiveCart(options: GetCartParams): Promise<Cart | null> {
-    let cart: Cart | null = null
+  public async getAllActiveCarts(options: GetCartParams): Promise<Cart[]> {
+    let activeCarts: Cart[] = []
 
     let field = 'customerId'
     if (options.customerType === 'anonymous') {
@@ -181,16 +239,32 @@ export class CommercetoolsAuth0 {
         params: {
           where: [`${field} = "${options.customerId}"`, 'cartState = "Active"'],
           sort: 'lastModifiedAt desc',
+          limit: options?.limit ?? 500,
         },
       })
-      if (carts.count) {
-        cart = carts.results[0]
-      }
+
+      activeCarts = carts.results
     } catch (e) {
-      console.log(`Error querying cart with [${options?.customerType}]Id of [${options?.customerId}]`)
+      console.log(`Error querying cart(s) with [${options?.customerType}]Id of [${options?.customerId}]`)
     }
 
-    return cart
+    return activeCarts
+  }
+
+  /**
+   * Get the active cart for a given anonymous/account customer id
+   *
+   * A customer's active cart is defined as their most recently modified cart which
+   * has a `cartState` of `Active`.
+   */
+  public async getActiveCart(options: GetCartParams): Promise<Cart | null> {
+    const carts = await this.getAllActiveCarts({ ...options, limit: 1 })
+
+    if (carts.length) {
+      return carts[0]
+    }
+
+    return null
   }
 
   /**

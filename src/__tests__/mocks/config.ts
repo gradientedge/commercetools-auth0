@@ -7,5 +7,6 @@ export const mockConfig: CommercetoolsAuth0Config = {
     region: Region.EUROPE_GCP,
     clientId: 'test-client-id',
     clientSecret: 'test-client-secret',
+    deleteObsoleteCarts: true,
   },
 }
