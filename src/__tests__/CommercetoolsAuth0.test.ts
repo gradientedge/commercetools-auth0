@@ -113,33 +113,6 @@ describe('CommercetoolsAuth0', () => {
     })
   })
 
-  describe('postRegistrationSync', () => {
-    it("should update the commercetools customer's`externalId` with the Auth0 user id", async () => {
-      nock('https://api.europe-west1.gcp.commercetools.com', {
-        reqheaders: {
-          authorization: 'Bearer test-access-token',
-        },
-      })
-        .get('/test-project-key/customers/account-customer-id')
-        .reply(200, { customer: mockCustomer })
-      nock('https://api.europe-west1.gcp.commercetools.com', {
-        reqheaders: {
-          authorization: 'Bearer test-access-token',
-        },
-      })
-        .post('/test-project-key/customers/account-customer-id', {
-          actions: [{ action: 'setExternalId', externalId: 'auth0-user-id' }],
-        })
-        .reply(200, { customer: mockCustomer })
-      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
-
-      await commercetoolsAuth0.postRegistrationSync({
-        userId: 'auth0-user-id',
-        accountCustomerId: 'account-customer-id',
-      })
-    })
-  })
-
   describe('assignAnonymousCartToAccountCustomer', () => {
     it('should set the customer id on the anonymous cart', async () => {
       const mockAnonymousCart = _.cloneDeep({
