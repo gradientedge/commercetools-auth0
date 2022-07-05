@@ -238,6 +238,11 @@ export class CommercetoolsAuth0 {
           lastName: options.user.lastName,
           externalId: options.user.id,
           authenticationMode: 'ExternalAuth',
+          stores:
+            options.stores?.map((storeKey) => ({
+              typeId: 'store',
+              storeKey,
+            })) ?? [],
         },
       })
     } catch (e: any) {

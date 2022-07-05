@@ -36,6 +36,7 @@ describe('CommercetoolsAuth0', () => {
           firstName: 'Jimmy',
           lastName: 'Thomson',
           authenticationMode: 'ExternalAuth',
+          stores: [],
         })
         .reply(200, { customer: mockCustomer })
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
@@ -242,6 +243,7 @@ describe('CommercetoolsAuth0', () => {
           lastName: 'Thomson',
           externalId: 'auth0|12345678901234567890',
           authenticationMode: 'ExternalAuth',
+          stores: [],
         })
         .reply(200, { customer: mockCustomer })
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
