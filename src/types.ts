@@ -23,11 +23,15 @@ export interface PostLoginSyncParams {
    */
   accountCustomerId?: string
   /**
-   * The key of the commercetools store that this customer relates to
+   * The key of the commercetools store that the customer is logging in to
    *
    * Not required if customers are global.
    */
   storeKey?: string
+  /**
+   * A list of store keys that you want to associate the customer with
+   */
+  stores?: string[]
   /**
    * User profile data as provided by Auth0
    */
@@ -50,11 +54,13 @@ export interface PostLoginSyncParams {
 
 export interface CreateCustomerParams {
   storeKey?: string
+  stores?: string[]
   user: {
     id?: string
     email: string
     firstName?: string
     lastName?: string
+    stores?: string[]
   }
 }
 
