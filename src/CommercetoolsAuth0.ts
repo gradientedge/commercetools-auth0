@@ -241,7 +241,7 @@ export class CommercetoolsAuth0 {
           stores:
             options.stores?.map((storeKey) => ({
               typeId: 'store',
-              storeKey,
+              key: storeKey,
             })) ?? [],
         },
       })
