@@ -233,6 +233,7 @@ export class CommercetoolsAuth0 {
       signInResult = await this.client.createAccount({
         storeKey: options.storeKey,
         data: {
+          ...options.data,
           email: options.user.email,
           firstName: options.user.firstName,
           lastName: options.user.lastName,
