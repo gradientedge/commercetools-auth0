@@ -1,4 +1,5 @@
 import { Cart, Region } from '@gradientedge/commercetools-utils'
+import { CustomerDraft } from '@gradientedge/commercetools-utils/dist/typings/models'
 
 export interface CommercetoolsAuth0Config {
   commercetools: {
@@ -43,6 +44,11 @@ export interface PostLoginSyncParams {
   }
 
   /**
+   * Any additional customer data that need to be passed in
+   */
+  data?: Partial<CustomerDraft> | null
+
+  /**
    * Whether to merge the carts (if available)
    *
    * true - standard commercetools cart merging functionality will be used
@@ -62,6 +68,7 @@ export interface CreateCustomerParams {
     lastName?: string
     stores?: string[]
   }
+  data?: Partial<CustomerDraft> | null
 }
 
 export interface GetCartParams {
