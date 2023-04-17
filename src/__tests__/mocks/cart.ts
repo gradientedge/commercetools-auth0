@@ -13,6 +13,8 @@ export const mockCart: Cart = {
   },
   customerId: '77a25b4e-6864-45fe-98c7-0d3490f6b4b9',
   anonymousId: '107896b9-bcba-4c24-8f01-0269ba08e47e',
+  shippingMode: 'Single',
+  shipping: [],
   lineItems: [
     {
       id: 'd85d1ed6-f779-40da-93d8-0204099b0a13',
@@ -81,6 +83,8 @@ export const mockCart: Cart = {
         fractionDigits: 2,
       },
       lineItemMode: 'Standard',
+      taxedPricePortions: [],
+      perMethodTaxRate: [],
     },
   ],
   cartState: 'Active',

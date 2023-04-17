@@ -31,6 +31,6 @@
     "entryPoints": ["src/index.ts"],
     "out": "docs",
     "excludePrivate": false,
-    "readme": "src/lib/auth/README.md"
+    "readme": "README.md"
   }
 }

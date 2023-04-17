@@ -192,7 +192,7 @@ export class CommercetoolsAuth0 {
       const carts = await this.client.queryCarts({
         storeKey: options.storeKey,
         params: {
-          where: [`${field} = "${options.customerId}"`, 'cartState = "Active"'],
+          where: `${field}="${options.customerId}" and cartState="Active"`,
           sort: 'lastModifiedAt desc',
           limit: options?.limit ?? 500,
         },
