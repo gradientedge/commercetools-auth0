@@ -22,8 +22,6 @@ describe('CommercetoolsAuth0', () => {
     nock.enableNetConnect()
   })
 
-  beforeEach(() => {})
-
   describe('postLoginSync', () => {
     it('should create the customer if no `accountCustomerId` provided', async () => {
       nock('https://api.europe-west1.gcp.commercetools.com', {
@@ -271,7 +269,7 @@ describe('CommercetoolsAuth0', () => {
       })
         .get('/test-project-key/carts')
         .query({
-          where: ['anonymousId = "anonymous-customer-id"', 'cartState = "Active"'],
+          where: 'anonymousId="anonymous-customer-id" and cartState="Active"',
           sort: 'lastModifiedAt desc',
           limit: 1,
         })
@@ -304,7 +302,7 @@ describe('CommercetoolsAuth0', () => {
       })
         .get('/test-project-key/carts')
         .query({
-          where: ['customerId = "account-customer-id"', 'cartState = "Active"'],
+          where: 'customerId="account-customer-id" and cartState="Active"',
           sort: 'lastModifiedAt desc',
           limit: 1,
         })
@@ -363,7 +361,7 @@ describe('CommercetoolsAuth0', () => {
       })
         .get('/test-project-key/carts')
         .query({
-          where: ['anonymousId = "anonymous-customer-id"', 'cartState = "Active"'],
+          where: 'anonymousId="anonymous-customer-id" and cartState="Active"',
           sort: 'lastModifiedAt desc',
           limit: 500,
         })
@@ -404,7 +402,7 @@ describe('CommercetoolsAuth0', () => {
       })
         .get('/test-project-key/carts')
         .query({
-          where: ['customerId = "account-customer-id"', 'cartState = "Active"'],
+          where: 'customerId="account-customer-id" and cartState="Active"',
           sort: 'lastModifiedAt desc',
           limit: 500,
         })
@@ -421,6 +419,62 @@ describe('CommercetoolsAuth0', () => {
         customerId: 'account-customer-id',
       })
 
+      expect(result.length).toEqual(2)
+      expect(result[0]).toEqual(mockCustomerCart1)
+      expect(result[1]).toEqual(mockCustomerCart2)
+    })
+
+    it('should retry the query to get carts if the first call fails', async () => {
+      const mockCustomerCart1 = _.cloneDeep({
+        ...mockCart,
+        anonymousId: 'anonymous-customer-id',
+        customerId: 'account-customer-id',
+      })
+      const mockCustomerCart2 = _.cloneDeep({
+        ...mockCart,
+        id: '541e5078-379f-4b1f-9f1e-06eecc86eeed',
+        lastModifiedAt: '2022-03-31T15:28:06.261Z',
+        anonymousId: 'anonymous-customer-id',
+        customerId: 'account-customer-id',
+      })
+      const errorScope = nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .get('/test-project-key/carts')
+        .query({
+          where: 'customerId="account-customer-id" and cartState="Active"',
+          sort: 'lastModifiedAt desc',
+          limit: 500,
+        })
+        .reply(503, 'Service Unavailable')
+      const successScope = nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .get('/test-project-key/carts')
+        .query({
+          where: 'customerId="account-customer-id" and cartState="Active"',
+          sort: 'lastModifiedAt desc',
+          limit: 500,
+        })
+        .reply(200, {
+          count: 2,
+          total: 2,
+          results: [mockCustomerCart1, mockCustomerCart2],
+        })
+
+      const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
+
+      const result = await commercetoolsAuth0.getAllActiveCarts({
+        customerType: 'account',
+        customerId: 'account-customer-id',
+      })
+
+      expect(errorScope.isDone()).toBeTruthy()
+      expect(successScope.isDone()).toBeTruthy()
       expect(result.length).toEqual(2)
       expect(result[0]).toEqual(mockCustomerCart1)
       expect(result[1]).toEqual(mockCustomerCart2)
@@ -451,7 +505,7 @@ describe('CommercetoolsAuth0', () => {
       })
         .get('/test-project-key/carts')
         .query({
-          where: ['customerId = "account-customer-id"', 'cartState = "Active"'],
+          where: 'customerId="account-customer-id" and cartState="Active"',
           sort: 'lastModifiedAt desc',
           limit: 500,
         })
