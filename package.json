@@ -51,7 +51,7 @@
   "homepage": "https://github.com/gradientedge/commercetools-auth0#readme",
   "devDependencies": {
     "@sinonjs/fake-timers": "^10.0.2",
-    "@types/jest": "^29.5.0",
+    "@types/jest": "^29.5.1",
     "@types/json-stringify-safe": "^5.0.0",
     "@types/lodash": "^4.14.194",
     "@types/lodash.clonedeep": "^4.5.7",
@@ -79,11 +79,11 @@
     "ts-node": "^10.9.1",
     "typedoc": "^0.24.4",
     "typescript": "~5.0.4",
-    "webpack": "^5.79.0",
+    "webpack": "^5.80.0",
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
-    "@gradientedge/commercetools-utils": "^5.2.1"
+    "@gradientedge/commercetools-utils": "^5.2.2"
   },
   "config": {
     "commitizen": {
