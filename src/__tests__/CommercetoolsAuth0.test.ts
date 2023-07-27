@@ -1,6 +1,13 @@
 import { CommercetoolsAuth0 } from '../CommercetoolsAuth0'
 import { Cart } from '@gradientedge/commercetools-utils'
-import { mockCart, mockClientGrantResponse, mockConfig, mockCustomer } from './mocks'
+import {
+  mockCart,
+  mockClientGrantResponse,
+  mockConfig,
+  mockCustomer,
+  mockCustomerDetails,
+  mockGraphQlCustomer,
+} from './mocks'
 import nock from 'nock'
 import _ from 'lodash'
 
@@ -23,7 +30,7 @@ describe('CommercetoolsAuth0', () => {
   })
 
   describe('postLoginSync', () => {
-    it('should create the customer if no `accountCustomerId` provided', async () => {
+    it('should create the customer and return customer details if no `accountCustomerId` provided', async () => {
       nock('https://api.europe-west1.gcp.commercetools.com', {
         reqheaders: {
           authorization: 'Bearer test-access-token',
@@ -37,6 +44,20 @@ describe('CommercetoolsAuth0', () => {
           stores: [],
         })
         .reply(200, { customer: mockCustomer })
+
+      nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .post('/test-project-key/graphql', {
+          query: `{ customer(id: "${mockCustomer.id}"){firstName
+          lastName
+          customerGroup {
+          key }}}`,
+        })
+        .reply(200, { data: mockGraphQlCustomer })
+
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
 
       const result = await commercetoolsAuth0.postLoginSync({
@@ -48,10 +69,23 @@ describe('CommercetoolsAuth0', () => {
         },
       })
 
-      expect(result).toEqual(mockCustomer)
+      expect(result).toEqual({ ...mockCustomerDetails, id: mockCustomer.id, newUserCreated: true })
     })
 
-    it('should not return a customer if the `accountCustomerId` is provided', async () => {
+    it('should return customer details if the `accountCustomerId` is provided', async () => {
+      nock('https://api.europe-west1.gcp.commercetools.com', {
+        reqheaders: {
+          authorization: 'Bearer test-access-token',
+        },
+      })
+        .post('/test-project-key/graphql', {
+          query: `{ customer(id: "account-customer-id-guid"){firstName
+          lastName
+          customerGroup {
+          key }}}`,
+        })
+        .reply(200, { data: mockGraphQlCustomer })
+
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
 
       const result = await commercetoolsAuth0.postLoginSync({
@@ -65,14 +99,14 @@ describe('CommercetoolsAuth0', () => {
         },
       })
 
-      expect(result).toBeNull()
+      expect(result).toEqual(mockCustomerDetails)
     })
 
     it('should attempt to merge carts when both an anonymous and account customer id are available', async () => {
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
       commercetoolsAuth0.mergeCart = jest.fn<Promise<Cart | null>, any>().mockResolvedValue(mockCart)
 
-      const result = await commercetoolsAuth0.postLoginSync({
+      await commercetoolsAuth0.postLoginSync({
         accountCustomerId: 'account-customer-id-guid',
         anonymousCustomerId: 'anonymous-customer-id-guid',
         mergeCart: true,
@@ -84,7 +118,6 @@ describe('CommercetoolsAuth0', () => {
         },
       })
 
-      expect(result).toBeNull()
       expect(commercetoolsAuth0.mergeCart).toHaveBeenCalledWith({
         accountCustomerId: 'account-customer-id-guid',
         anonymousCustomerId: 'anonymous-customer-id-guid',
@@ -95,7 +128,7 @@ describe('CommercetoolsAuth0', () => {
       const commercetoolsAuth0 = new CommercetoolsAuth0(mockConfig)
       commercetoolsAuth0.mergeCart = jest.fn<Promise<Cart | null>, any>().mockResolvedValue(mockCart)
 
-      const result = await commercetoolsAuth0.postLoginSync({
+      await commercetoolsAuth0.postLoginSync({
         accountCustomerId: 'account-customer-id-guid',
         anonymousCustomerId: 'anonymous-customer-id-guid',
         mergeCart: false,
@@ -107,7 +140,6 @@ describe('CommercetoolsAuth0', () => {
         },
       })
 
-      expect(result).toBeNull()
       expect(commercetoolsAuth0.mergeCart).not.toHaveBeenCalled()
     })
   })

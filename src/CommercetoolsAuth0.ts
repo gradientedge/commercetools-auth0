@@ -9,6 +9,7 @@ import {
   MergeAnonymousToAccountCartParams,
   MergeCartParams,
   GetCartParams,
+  CustomerDetails,
 } from './types'
 import { COMMERCETOOLS_REQUIRED_SCOPES, DEFAULT_REQUEST_TIMEOUT_MS } from './constants'
 import { CommercetoolsAuth0ErrorCode } from './error/codes'
@@ -53,12 +54,13 @@ export class CommercetoolsAuth0 {
    * Regardless of which of the above scenarios applies, we end up with the id of a
    * commercetools account customer. If we were
    */
-  public async postLoginSync(options: PostLoginSyncParams): Promise<Customer | null> {
-    let customer: Customer | null = null
+  public async postLoginSync(options: PostLoginSyncParams): Promise<CustomerDetails> {
     let accountCustomerId: string | undefined = options.accountCustomerId
+    let newUser: boolean = false
     if (!accountCustomerId) {
-      customer = await this.createCustomer(options)
+      const customer = await this.createCustomer(options)
       accountCustomerId = customer.id
+      newUser = true
     }
     if (options.mergeCart && options.anonymousCustomerId) {
       await this.mergeCart({
@@ -67,7 +69,9 @@ export class CommercetoolsAuth0 {
         accountCustomerId,
       })
     }
-    return customer
+    const customerDetails = await this.getCustomerDetails(accountCustomerId)
+    customerDetails.newUserCreated = newUser
+    return customerDetails
   }
 
   /**
@@ -220,6 +224,37 @@ export class CommercetoolsAuth0 {
     }
 
     return null
+  }
+
+  /**
+   * Return the customer details from the Commercetools graphQl response
+   *
+   * @param id - Commercetools customer id
+   */
+  public async getCustomerDetails(customerId: string): Promise<CustomerDetails> {
+    const customerDetails: CustomerDetails = {
+      id: customerId,
+      firstName: '',
+      lastName: '',
+      customerGroupKey: '',
+      newUserCreated: false,
+    }
+    try {
+      const response = await this.client.graphql({
+        data: {
+          query: `{ customer(id: "${customerId}"){firstName
+          lastName
+          customerGroup {
+          key }}}`,
+        },
+      })
+      customerDetails.firstName = response?.data?.customer?.firstName || ''
+      customerDetails.lastName = response?.data?.customer?.lastName || ''
+      customerDetails.customerGroupKey = response?.data?.customer?.customerGroup?.key || ''
+    } catch (error) {
+      console.log(`Error retrieving customer details for customer Id [${customerId}]`)
+    }
+    return customerDetails
   }
 
   /**

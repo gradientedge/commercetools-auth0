@@ -1,4 +1,5 @@
 import { Customer } from '@gradientedge/commercetools-utils'
+import { CustomerDetails } from '../../types'
 
 export const mockCustomer: Customer = {
   id: '47d9dc26-03cf-40c7-90ab-fe531df37f29',
@@ -22,4 +23,22 @@ export const mockCustomer: Customer = {
   isEmailVerified: false,
   stores: [],
   authenticationMode: 'ExternalAuth',
+}
+
+export const mockGraphQlCustomer = {
+  customer: {
+    firstName: 'Jimmy',
+    lastName: 'Thomson',
+    customerGroup: {
+      key: 'gold',
+    },
+  },
+}
+
+export const mockCustomerDetails: CustomerDetails = {
+  id: 'account-customer-id-guid',
+  firstName: 'Jimmy',
+  lastName: 'Thomson',
+  customerGroupKey: 'gold',
+  newUserCreated: false,
 }
