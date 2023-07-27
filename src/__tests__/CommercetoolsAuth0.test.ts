@@ -51,10 +51,15 @@ describe('CommercetoolsAuth0', () => {
         },
       })
         .post('/test-project-key/graphql', {
-          query: `{ customer(id: "${mockCustomer.id}"){firstName
-          lastName
-          customerGroup {
-          key }}}`,
+          query: `{
+            customer(id: "${mockCustomer.id}") {
+              firstName
+              lastName
+              customerGroup {
+                key
+              }
+            }
+          }`,
         })
         .reply(200, { data: mockGraphQlCustomer })
 
@@ -69,7 +74,7 @@ describe('CommercetoolsAuth0', () => {
         },
       })
 
-      expect(result).toEqual({ ...mockCustomerDetails, id: mockCustomer.id, newUserCreated: true })
+      expect(result).toEqual({ ...mockCustomerDetails, id: mockCustomer.id, isNewCustomer: true })
     })
 
     it('should return customer details if the `accountCustomerId` is provided', async () => {
@@ -79,10 +84,15 @@ describe('CommercetoolsAuth0', () => {
         },
       })
         .post('/test-project-key/graphql', {
-          query: `{ customer(id: "account-customer-id-guid"){firstName
-          lastName
-          customerGroup {
-          key }}}`,
+          query: `{
+            customer(id: "account-customer-id-guid") {
+              firstName
+              lastName
+              customerGroup {
+                key
+              }
+            }
+          }`,
         })
         .reply(200, { data: mockGraphQlCustomer })
 

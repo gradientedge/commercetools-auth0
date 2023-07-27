@@ -104,6 +104,6 @@ export interface CustomerDetails {
   id: string
   firstName?: string
   lastName?: string
-  customerGroupKey?: string
-  newUserCreated: boolean
+  groupKey?: string
+  isNewCustomer: boolean
 }

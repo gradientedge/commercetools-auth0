@@ -39,6 +39,6 @@ export const mockCustomerDetails: CustomerDetails = {
   id: 'account-customer-id-guid',
   firstName: 'Jimmy',
   lastName: 'Thomson',
-  customerGroupKey: 'gold',
-  newUserCreated: false,
+  groupKey: 'gold',
+  isNewCustomer: false,
 }

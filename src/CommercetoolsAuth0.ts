@@ -56,11 +56,11 @@ export class CommercetoolsAuth0 {
    */
   public async postLoginSync(options: PostLoginSyncParams): Promise<CustomerDetails> {
     let accountCustomerId: string | undefined = options.accountCustomerId
-    let newUser: boolean = false
+    let isNewCustomer = false
     if (!accountCustomerId) {
       const customer = await this.createCustomer(options)
       accountCustomerId = customer.id
-      newUser = true
+      isNewCustomer = true
     }
     if (options.mergeCart && options.anonymousCustomerId) {
       await this.mergeCart({
@@ -70,8 +70,10 @@ export class CommercetoolsAuth0 {
       })
     }
     const customerDetails = await this.getCustomerDetails(accountCustomerId)
-    customerDetails.newUserCreated = newUser
-    return customerDetails
+    return {
+      ...customerDetails,
+      isNewCustomer,
+    }
   }
 
   /**
@@ -231,30 +233,31 @@ export class CommercetoolsAuth0 {
    *
    * @param id - Commercetools customer id
    */
-  public async getCustomerDetails(customerId: string): Promise<CustomerDetails> {
-    const customerDetails: CustomerDetails = {
-      id: customerId,
-      firstName: '',
-      lastName: '',
-      customerGroupKey: '',
-      newUserCreated: false,
-    }
+  public async getCustomerDetails(customerId: string): Promise<Omit<CustomerDetails, 'isNewCustomer'>> {
+    let response
     try {
-      const response = await this.client.graphql({
+      response = await this.client.graphql({
         data: {
-          query: `{ customer(id: "${customerId}"){firstName
-          lastName
-          customerGroup {
-          key }}}`,
+          query: `{
+            customer(id: "${customerId}") {
+              firstName
+              lastName
+              customerGroup {
+                key
+              }
+            }
+          }`,
         },
       })
-      customerDetails.firstName = response?.data?.customer?.firstName || ''
-      customerDetails.lastName = response?.data?.customer?.lastName || ''
-      customerDetails.customerGroupKey = response?.data?.customer?.customerGroup?.key || ''
     } catch (error) {
       console.log(`Error retrieving customer details for customer Id [${customerId}]`)
     }
-    return customerDetails
+    return {
+      id: customerId,
+      firstName: response?.data?.customer?.firstName || '',
+      lastName: response?.data?.customer?.lastName || '',
+      groupKey: response?.data?.customer?.customerGroup?.key || '',
+    }
   }
 
   /**
