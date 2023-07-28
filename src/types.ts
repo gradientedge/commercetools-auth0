@@ -99,3 +99,11 @@ export interface MergeAnonymousToAccountCartParams {
   anonymousCustomerCart: Cart
   accountCustomerCart: Cart
 }
+
+export interface CustomerDetails {
+  id: string
+  firstName: string
+  lastName: string
+  groupKey: string | null
+  isNewCustomer: boolean
+}
